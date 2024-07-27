@@ -1,0 +1,190 @@
+CODE-
+-- Step 1: Create the database if it doesn't exist
+CREATE DATABASE IF NOT EXISTS SALESWALMARTDATA;
+
+-- Step 2: Select the database
+USE SALESWALMARTDATA;
+CREATE TABLE IF NOT EXISTS sales (
+    invoice_id VARCHAR(30) NOT NULL PRIMARY KEY,
+    branch VARCHAR(5) NOT NULL,
+    city VARCHAR(30) NOT NULL,
+    customer_type VARCHAR(30) NOT NULL,
+    gender VARCHAR(30) NOT NULL,
+    product_line VARCHAR(100) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    quantity INT NOT NULL,
+    tax_pct DECIMAL(6,4) NOT NULL,
+    total DECIMAL(12,4) NOT NULL,
+    date DATETIME NOT NULL,
+    time TIME NOT NULL,
+    payment VARCHAR(15) NOT NULL,
+    cogs DECIMAL(10,2) NOT NULL,
+    gross_margin_pct DECIMAL(11,9),
+    gross_income DECIMAL(12,4),
+    rating DECIMAL(2,1)
+);
+SELECT
+	time,
+	(CASE
+		WHEN `time` BETWEEN "00:00:00" AND "12:00:00" THEN "Morning"
+        WHEN `time` BETWEEN "12:01:00" AND "16:00:00" THEN "Afternoon"
+        ELSE "Evening"
+    END) AS time_of_day
+FROM sales;
+ALTER TABLE SALES ADD COLUMN time_of_day varchar(20);
+-- Disable safe update mode
+SET SQL_SAFE_UPDATES = 0;
+
+-- Update the table
+UPDATE sales
+SET time_of_day = (
+	CASE
+		WHEN `time` BETWEEN "00:00:00" AND "12:00:00" THEN "Morning"
+        WHEN `time` BETWEEN "12:01:00" AND "16:00:00" THEN "Afternoon"
+        ELSE "Evening"
+    END
+);
+SELECT
+	date,
+	DAYNAME(date) as day_name 
+FROM sales;
+
+ALTER TABLE sales ADD COLUMN day_name VARCHAR(10);
+
+UPDATE sales
+SET day_name = DAYNAME(date);
+select*from sales;
+SELECT
+	date,
+	MONTHNAME(date) as month_name
+FROM sales;
+
+select distinct city from sales ;
+select payment,
+count(payment) as cnt
+from sales
+group by payment;
+ 
+ select product_line,
+ count(product_line) as cnt
+ FROM sales
+ group by product_line;
+ 
+ select month_name as MONTH,
+ sum(total) as total_revenue
+ from sales
+ group by month_name;
+ 
+select month_name as MONTH,
+SUM(COGS) AS COGS
+FROM salES
+GROUP BY month
+ORDER BY COGS;
+
+select product_line,
+ SUM(TOTAL) as Total_revenue
+ FROM sales
+ group by product_line;
+ 
+ SELECT
+	branch,
+	city,
+	SUM(total) AS total_revenue
+FROM sales
+GROUP BY city, branch 
+ORDER BY total_revenue DESC ;
+SELECT 
+PRODUCT_LINE,
+AVG(tax_pct) AS AVG_VAT
+FROM SALES
+GROUP BY PRODUCT_LINE
+ORDER BY AVG_VAT DESC;
+
+select AVG(quantity) as avg_quantity from sales;
+select product_line,
+case when AVG(quantity)> 6 then "GOOD"
+ELSE "BAD"
+END AS REMARKS 
+FROM SALES
+GROUP BY product_line;
+
+select branch,
+sum(quantity) as qnty
+from sales
+group by branch 
+having sum(quantity) > (select avg(quantity) from sales);
+
+select gender,product_line,
+count(gender) as gen
+from sales
+group by gender,product_line
+ORDER BY GEN DESC;
+SELECT
+	ROUND(AVG(rating), 2) as avg_rating,
+    product_line
+FROM sales
+GROUP BY product_linE;
+SELECT customer_type,
+	count(*) as count
+FROM sales
+GROUP BY customer_type
+ORDER BY count DESC;
+
+SELECT CUSTOMER_TYPE,
+COUNT(*)
+FROM SALES
+GROUP BY CUSTOMER_TYPE;
+SELECT GENDER, CUSTOMER_TYPE,
+COUNT(GENDER) AS GEN
+FROM sales
+GROUP BY GENDER,CUSTOMER_TYPE
+ORDER BY GEN DESC;
+SELECT
+    gender,
+    COUNT(*) AS gender_cnt
+FROM sales
+WHERE branch = 'C'
+GROUP BY gender
+ORDER BY gender_cnt DESC;
+SELECT TIME_OF_DAY,
+AVG(rating) as rat
+from sales
+group by time_of_day
+order by rat desc;
+select day_name,
+avg(rating) as avg_rate
+from sales 
+group by day_name
+order by avg_rate desc;
+select day_name,
+avg(rating) as avg_rate
+From sales
+where branch='C'
+group by day_name;
+
+SELECT
+	time_of_day,
+	COUNT(*) AS total_sales
+FROM sales
+WHERE day_name = "TUESDAY"
+GROUP BY time_of_day 
+ORDER BY total_sales DESC;
+
+SELECT
+	customer_type,
+	SUM(total) AS total_revenue
+FROM sales
+GROUP BY customer_type
+ORDER BY total_revenue;
+SELECT
+	city,
+ AVG(tax_pct) AS avg_tax_pct
+FROM sales
+GROUP BY city 
+ORDER BY avg_tax_pct DESC;
+SELECT
+	customer_type,
+	AVG(tax_pct) AS total_tax
+FROM sales
+GROUP BY customer_type
+ORDER BY total_tax;
